@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>To-Do List</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      height: 100vh;
+      padding-top: 50px;
+    }
+    #list {
+      background: white;
+      padding: 20px;
+      width: 400px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      border-radius: 8px;
+    }
+    #list h2 {
+      margin: 0 0 15px;
+      text-align: center;
+      color: #333;
+    }
+    #inputItems {
+      width: 75%;
+      padding: 10px;
+      font-size: 16px;
+      border: 2px solid #ddd;
+      border-radius: 4px 0 0 4px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    #inputItems:focus {
+      border-color: #7c9ff2;
+    }
+    .addElemsBtn {
+      width: 25%;
+      padding: 10px;
+      background-color: #7c9ff2;
+      color: white;
+      border: none;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 0 4px 4px 0;
+      transition: background-color 0.3s;
+      text-align: center;
+      user-select: none;
+    }
+    .addElemsBtn:hover {
+      background-color: #5a7ed9;
+    }
+    ul {
+      list-style-type: none;
+      padding-left: 0;
+      margin-top: 20px;
+    }
+    ul li {
+      background-color: #eee;
+      margin-bottom: 8px;
+      padding: 12px 40px 12px 12px;
+      font-size: 18px;
+      position: relative;
+      cursor: pointer;
+      border-radius: 4px;
+      user-select: none;
+      transition: background-color 0.2s;
+    }
+    ul li.checked {
+      background-color: #888;
+      color: #fff;
+      text-decoration: line-through;
+    }
+    ul li.checked::before {
+      content: '';
+      position: absolute;
+      left: 12px;
+      top: 14px;
+      width: 8px;
+      height: 14px;
+      border: solid white;
+      border-width: 0 3px 3px 0;
+      transform: rotate(45deg);
+    }
+    .close {
+      position: absolute;
+      right: 12px;
+      top: 12px;
+      color: #888;
+      font-weight: bold;
+      font-size: 20px;
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.3s;
+    }
+    .close:hover {
+      color: #f44336;
+    }
+  </style>
+</head>
+<body>
+  <div id="list">
+    <h2>To-Do List</h2>
+    <input type="text" id="inputItems" placeholder="Add items" />
+    <button class="addElemsBtn" onclick="addElement()">Add</button>
+    <ul id="placeholderItems">
+      <li>Item 1<span class="close">&times;</span></li>
+      <li class="checked">Item 2<span class="close">&times;</span></li>
+      <li>Item 3<span class="close">&times;</span></li>
+      <li>Item 4<span class="close">&times;</span></li>
+    </ul>
+  </div>
+
+  <script>
+    // Function to add the close buttons to existing list items (if missing)
+    function addCloseButtons() {
+      const listItems = document.querySelectorAll('#placeholderItems li');
+      listItems.forEach(li => {
+        if (!li.querySelector('.close')) {
+          const span = document.createElement('span');
+          span.className = 'close';
+          span.textContent = '\u00D7'; // × symbol
+          li.appendChild(span);
+        }
+      });
+    }
+
+    // Function to remove list item on clicking the close button
+    function setupCloseButtons() {
+      const closeButtons = document.querySelectorAll('.close');
+      closeButtons.forEach(btn => {
+        btn.onclick = function() {
+          const li = this.parentElement;
+          li.remove();
+        }
+      });
+    }
+
+    // Toggle checked class on list items when clicked
+    document.getElementById('placeholderItems').addEventListener('click', function(e) {
+      if (e.target.tagName === 'LI') {
+        e.target.classList.toggle('checked');
+      }
+    });
+
+    // Add a new item from input box
+    function addElement() {
+      const input = document.getElementById('inputItems');
+      const inputValue = input.value.trim();
+      if (inputValue === '') {
+        alert('You must write something!');
+        return;
+      }
+
+      const li = document.createElement('li');
+      li.textContent = inputValue;
+
+      const span = document.createElement('span');
+      span.className = 'close';
+      span.textContent = '\u00D7';
+      li.appendChild(span);
+
+      document.getElementById('placeholderItems').appendChild(li);
+
+      input.value = '';
+
+      // Reapply close button functionality for the new item
+      setupCloseButtons();
+    }
+
+    // Initialize on page load
+    addCloseButtons();
+    setupCloseButtons();
+  </script>
+</body>
+</html>
