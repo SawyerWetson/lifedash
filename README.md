@@ -2,7 +2,7 @@
 
 **LifeDash** is a personal productivity dashboard designed for students and teens to organize their daily lives, track goals, log thoughts, and build healthy habits — all in one place.
 
-Created by Sawyer, this project is built entirely from scratch using HTML, CSS, and JavaScript, with minimal AI assistance. It's meant to be a fully offline, privacy-friendly, and easy-to-use tool that helps you stay on track without distractions.
+Created by Sawyer Wetson, this project is built entirely from scratch using HTML, CSS, and JavaScript, with minimal AI assistance. It's meant to be a fully offline, privacy-friendly, and easy-to-use tool that helps you stay on track without distractions.
 
 ---
 
@@ -43,6 +43,7 @@ You're free to use, modify, and build upon this project, as long as any modified
 See the LICENSE file for full details.
 
 🙌 Acknowledgments
+----------------------------------------------------------------------------
 Created by Sawyer
 
 Coded with ❤️ using vanilla HTML, CSS, and JavaScript
@@ -52,6 +53,7 @@ Logo generated with help from ChatGPT (image credit: [OpenAI DALL·E])
 Inspired by minimalist productivity tools and real-life student needs
 
 📣 Contribute
+----------------------------------------------------------------------------
 Suggestions, improvements, or ideas?
 Open an issue or fork the project and start building!
 
