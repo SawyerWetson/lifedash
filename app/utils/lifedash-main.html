@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LifeDash</title>
+  <style>
+    /* Reset and base */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      background-color: #2c3e50;
+      color: white;
+      width: 220px;
+      min-width: 220px;
+      transition: width 0.3s;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; bottom: 0; left: 0;
+      overflow: hidden;
+      z-index: 1000;
+    }
+    .sidebar.collapsed {
+      width: 60px;
+      min-width: 60px;
+    }
+
+    .sidebar .toggle-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 24px;
+      padding: 15px;
+      cursor: pointer;
+      text-align: center;
+      border-bottom: 1px solid #34495e;
+      user-select: none;
+    }
+
+    .sidebar button.tab-button {
+      background: none;
+      border: none;
+      color: white;
+      text-align: left;
+      padding: 15px 20px;
+      font-size: 16px;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .sidebar button.tab-button:hover,
+    .sidebar button.tab-button.active {
+      background-color: #34495e;
+    }
+    .sidebar button.tab-button span.icon {
+      margin-right: 15px;
+      font-size: 20px;
+      width: 24px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+    .sidebar.collapsed button.tab-button span.label {
+      display: none;
+    }
+
+    /* Main content */
+    .main {
+      margin-left: 220px;
+      padding: 20px;
+      width: calc(100% - 220px);
+      overflow-y: auto;
+      transition: margin-left 0.3s, width 0.3s;
+      height: 100vh;
+    }
+    .sidebar.collapsed ~ .main {
+      margin-left: 60px;
+      width: calc(100% - 60px);
+    }
+
+    /* Tabs */
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Headings */
+    h2 {
+      text-align: center;
+      margin-top: 0;
+    }
+
+    /* To-Do List */
+    #todo input[type="text"] {
+      width: 70%;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      margin-right: 10px;
+    }
+    #todo button.add-todo-btn {
+      padding: 10px 15px;
+      font-size: 16px;
+      border: none;
+      background-color: #2563eb;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    #todo button.add-todo-btn:hover {
+      background-color: #1e40af;
+    }
+    #todo ul {
+      list-style-type: none;
+      padding-left: 0;
+      margin-top: 20px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #todo ul li {
+      background: #eee;
+      margin-bottom: 10px;
+      padding: 12px 15px;
+      font-size: 18px;
+      position: relative;
+      cursor: pointer;
+      border-radius: 4px;
+      user-select: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background-color 0.2s;
+    }
+    #todo ul li.checked {
+      background-color: #888;
+      color: white;
+      text-decoration: line-through;
+    }
+    #todo ul li button.delete-btn {
+      background: none;
+      border: none;
+      font-size: 18px;
+      color: #f44336;
+      cursor: pointer;
+      user-select: none;
+    }
+    #todo ul li button.delete-btn:hover {
+      color: #b71c1c;
+    }
+
+    /* Journal */
+    #journal form {
+      max-width: 600px;
+      margin: 0 auto 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    #journal input[type="date"],
+    #journal textarea {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      resize: vertical;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    #journal textarea {
+      height: 150px;
+    }
+    #journal button {
+      width: 100px;
+      padding: 10px;
+      font-size: 16px;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      align-self: flex-start;
+      transition: background-color 0.3s;
+    }
+    #journal button:hover {
+      background-color: #1e40af;
+    }
+    #journal .journal-entry {
+      background: white;
+      border-radius: 5px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #journal .journal-entry strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #333;
+    }
+    #journal .journal-entry p {
+      white-space: pre-wrap;
+      line-height: 1.5;
+      color: #555;
+      margin: 0;
+    }
+
+    /* Calendar */
+    .calendar-controls {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .calendar-controls button {
+      background-color: #2563eb;
+      border: none;
+      color: white;
+      padding: 8px 14px;
+      margin: 0 5px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+    .calendar-controls button:hover {
+      background-color: #1e40af;
+    }
+    #monthYear {
+      font-weight: bold;
+      font-size: 18px;
+      margin: 0 10px;
+      vertical-align: middle;
+      user-select: none;
+    }
+    table.calendar {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      background: white;
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+    }
+    table.calendar th,
+    table.calendar td {
+      border: 1px solid #ddd;
+      width: 14.28%;
+      height: 80px;
+      text-align: right;
+      vertical-align: top;
+      padding: 6px 8px;
+      position: relative;
+      cursor: pointer;
+      user-select: none;
+    }
+    table.calendar th {
+      background-color: #2c3e50;
+      color: white;
+      font-weight: normal;
+    }
+    table.calendar td:hover {
+      background-color: #f0f8ff;
+    }
+    table.calendar td.today {
+      background-color: #d1fae5;
+      font-weight: bold;
+    }
+    table.calendar td .event {
+      position: absolute;
+      bottom: 5px;
+      left: 5px;
+      right: 5px;
+      background-color: #2563eb;
+      color: white;
+      font-size: 12px;
+      padding: 2px 4px;
+      border-radius: 4px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    /* Modal */
+    #modalOverlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 10000;
+    }
+    #eventModal {
+      display: none;
+      position: fixed;
+      top: 25%;
+      left: 50%;
+      transform: translate(-50%, -25%);
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 320px;
+      z-index: 10001;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    #eventModal h3 {
+      margin-top: 0;
+    }
+    #eventModal textarea {
+      width: 100%;
+      height: 100px;
+      padding: 10px;
+      font-size: 14px;
+      resize: vertical;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    #eventModal button {
+      padding: 10px 20px;
+      font-size: 14px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    #saveEventBtn {
+      background-color: #2563eb;
+      color: white;
+      margin-right: 10px;
+    }
+    #saveEventBtn:hover {
+      background-color: #1e40af;
+    }
+    #cancelEventBtn {
+      background-color: #9ca3af;
+      color: white;
+    }
+    #cancelEventBtn:hover {
+      background-color: #6b7280;
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="sidebar" id="sidebar">
+    <button class="toggle-btn" id="toggleBtn" aria-label="Toggle sidebar">☰</button>
+    <button class="tab-button active" data-tab="home"><span class="icon">🏠</span><span class="label">Home</span></button>
+    <button class="tab-button" data-tab="todo"><span class="icon">📝</span><span class="label">To-Do List</span></button>
+    <button class="tab-button" data-tab="journal"><span class="icon">📖</span><span class="label">Journal</span></button>
+    <button class="tab-button" data-tab="calendar"><span class="icon">📅</span><span class="label">Calendar</span></button>
+    <button class="tab-button" data-tab="about"><span class="icon">ℹ️</span><span class="label">About</span></button>
+  </nav>
+
+  <main class="main" id="mainContent">
+
+    <!-- Home -->
+    <section id="home" class="tab-content active">
+      <h2>Welcome to LifeDash</h2>
+      <p style="max-width: 600px; margin: auto; font-size: 18px; line-height: 1.5;">
+        Welcome to Lifedash, the all in one productivity app! This app contains multiple utillites for creativity! You made the right choice choosing lifedash, this app is dedicated to making your school life better and easier    <img width="504" height="504" alt="LifeDash_logo" src="https://github.com/user-attachments/assets/cb44a2d6-ce34-4037-bcaf-ae1a2cf51b68" />
+      </p>
+    </section>
+
+    <!-- To-Do List -->
+    <section id="todo" class="tab-content">
+      <h2>To-Do List</h2>
+      <div style="text-align: center;">
+        <input type="text" id="todoInput" placeholder="Add new task..." />
+        <button class="add-todo-btn" id="addTodoBtn">Add</button>
+      </div>
+      <ul id="todoList"></ul>
+    </section>
+
+    <!-- Journal -->
+    <section id="journal" class="tab-content">
+      <h2>Daily Journal</h2>
+      <form id="journalForm">
+        <input type="date" id="journalDate" required />
+        <textarea id="journalContent" placeholder="Write your journal entry here..." maxlength="2000" required></textarea>
+        <button type="submit">Save Entry</button>
+      </form>
+      <div id="journalEntries"></div>
+    </section>
+
+    <!-- Calendar -->
+    <section id="calendar" class="tab-content">
+      <h2>Calendar</h2>
+      <div class="calendar-controls">
+        <button id="prevMonthBtn">&#8592; Prev</button>
+        <span id="monthYear"></span>
+        <button id="nextMonthBtn">Next &#8594;</button>
+      </div>
+      <table class="calendar" aria-label="Calendar">
+        <thead>
+          <tr>
+            <th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
+          </tr>
+        </thead>
+        <tbody id="calendarBody"></tbody>
+      </table>
+    </section>
+
+    <!-- About -->
+    <section id="about" class="tab-content">
+      <h2>About LifeDash</h2>
+      <p style="max-width:600px; margin:auto; font-size: 18px; line-height: 1.5;">
+        LifeDash is a simple all-in-one app to help you organize your day with tasks, journaling, and events. Built with HTML, CSS, and JavaScript — all running right in your browser.
+      </p>
+    </section>
+  </main>
+
+  <!-- Event Modal -->
+  <div id="modalOverlay" aria-hidden="true"></div>
+  <div id="eventModal" role="dialog" aria-modal="true" aria-labelledby="eventDateLabel" aria-describedby="eventDesc">
+    <h3 id="eventDateLabel"></h3>
+    <textarea id="eventText" placeholder="Add event details here..."></textarea><br />
+    <button id="saveEventBtn">Save</button>
+    <button id="cancelEventBtn">Cancel</button>
+  </div>
+
+  <script>
+    // Sidebar toggle and tab switching
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.getElementById('toggleBtn');
+    const tabButtons = document.querySelectorAll('.sidebar .tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('collapsed');
+    });
+
+    tabButtons.forEach(button => {
+      button.addEventListener('click', () => {
+        // Remove active from all buttons & tabs
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        tabContents.forEach(tab => tab.classList.remove('active'));
+
+        // Activate clicked tab
+        button.classList.add('active');
+        const tabId = button.dataset.tab;
+        document.getElementById(tabId).classList.add('active');
+      });
+    });
+
+    // --- To-Do List ---
+    const todoInput = document.getElementById('todoInput');
+    const addTodoBtn = document.getElementById('addTodoBtn');
+    const todoList = document.getElementById('todoList');
+
+    function saveTodos() {
+      const todos = [];
+      todoList.querySelectorAll('li').forEach(li => {
+        todos.push({
+          text: li.querySelector('.text').textContent,
+          checked: li.classList.contains('checked')
+        });
+      });
+      localStorage.setItem('todos', JSON.stringify(todos));
+    }
+
+    function loadTodos() {
+      todoList.innerHTML = '';
+      const todos = JSON.parse(localStorage.getItem('todos') || '[]');
+      todos.forEach(todo => {
+        const li = document.createElement('li');
+        li.className = todo.checked ? 'checked' : '';
+        const spanText = document.createElement('span');
+        spanText.className = 'text';
+        spanText.textContent = todo.text;
+        li.appendChild(spanText);
+
+        const delBtn = document.createElement('button');
+        delBtn.className = 'delete-btn';
+        delBtn.title = 'Delete task';
+        delBtn.textContent = '✖';
+        delBtn.onclick = e => {
+          e.stopPropagation();
+          li.remove();
+          saveTodos();
+        };
+        li.appendChild(delBtn);
+
+        li.onclick = () => {
+          li.classList.toggle('checked');
+          saveTodos();
+        };
+
+        todoList.appendChild(li);
+      });
+    }
+
+    addTodoBtn.onclick = () => {
+      const val = todoInput.value.trim();
+      if (!val) {
+        alert('Please enter a task');
+        return;
+      }
+      const li = document.createElement('li');
+      const spanText = document.createElement('span');
+      spanText.className = 'text';
+      spanText.textContent = val;
+      li.appendChild(spanText);
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'delete-btn';
+      delBtn.title = 'Delete task';
+      delBtn.textContent = '✖';
+      delBtn.onclick = e => {
+        e.stopPropagation();
+        li.remove();
+        saveTodos();
+      };
+      li.appendChild(delBtn);
+
+      li.onclick = () => {
+        li.classList.toggle('checked');
+        saveTodos();
+      };
+
+      todoList.appendChild(li);
+      saveTodos();
+      todoInput.value = '';
+      todoInput.focus();
+    };
+
+    // --- Journal ---
+    const journalForm = document.getElementById('journalForm');
+    const journalDateInput = document.getElementById('journalDate');
+    const journalContentInput = document.getElementById('journalContent');
+    const journalEntriesDiv = document.getElementById('journalEntries');
+
+    function saveJournalEntries(entries) {
+      localStorage.setItem('journalEntries', JSON.stringify(entries));
+    }
+
+    function loadJournalEntries() {
+      journalEntriesDiv.innerHTML = '';
+      const entries = JSON.parse(localStorage.getItem('journalEntries') || '[]');
+      entries.sort((a, b) => new Date(b.date) - new Date(a.date)); // newest first
+
+      entries.forEach(entry => {
+        const entryDiv = document.createElement('div');
+        entryDiv.className = 'journal-entry';
+
+        const dateStrong = document.createElement('strong');
+        dateStrong.textContent = new Date(entry.date).toDateString();
+        entryDiv.appendChild(dateStrong);
+
+        const contentP = document.createElement('p');
+        contentP.textContent = entry.content;
+        entryDiv.appendChild(contentP);
+
+        journalEntriesDiv.appendChild(entryDiv);
+      });
+    }
+
+    journalForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const date = journalDateInput.value;
+      const content = journalContentInput.value.trim();
+      if (!date) {
+        alert('Please select a date.');
+        return;
+      }
+      if (!content) {
+        alert('Please write something in the journal entry.');
+        return;
+      }
+
+      let entries = JSON.parse(localStorage.getItem('journalEntries') || '[]');
+      // If entry for date exists, update it; else add new
+      const existingIndex = entries.findIndex(entry => entry.date === date);
+      if (existingIndex > -1) {
+        entries[existingIndex].content = content;
+      } else {
+        entries.push({ date, content });
+      }
+      saveJournalEntries(entries);
+      loadJournalEntries();
+      journalForm.reset();
+      alert('Journal entry saved!');
+    });
+
+    // Load journal entries on page load
+    loadJournalEntries();
+
+    // --- Calendar ---
+    const prevMonthBtn = document.getElementById('prevMonthBtn');
+    const nextMonthBtn = document.getElementById('nextMonthBtn');
+    const monthYearLabel = document.getElementById('monthYear');
+    const calendarBody = document.getElementById('calendarBody');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const eventModal = document.getElementById('eventModal');
+    const eventDateLabel = document.getElementById('eventDateLabel');
+    const eventText = document.getElementById('eventText');
+    const saveEventBtn = document.getElementById('saveEventBtn');
+    const cancelEventBtn = document.getElementById('cancelEventBtn');
+
+    let currentYear, currentMonth;
+
+    function showCalendar(year, month) {
+      currentYear = year;
+      currentMonth = month;
+
+      monthYearLabel.textContent = new Date(year, month).toLocaleString('default', {month: 'long', year: 'numeric'});
+      calendarBody.innerHTML = '';
+
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      // Empty cells before first day
+      for (let i = 0; i < firstDay; i++) {
+        const emptyCell = document.createElement('td');
+        calendarBody.appendChild(emptyCell);
+      }
+
+      const today = new Date();
+      const events = JSON.parse(localStorage.getItem('calendarEvents') || '{}');
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const cell = document.createElement('td');
+        cell.textContent = day;
+
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+          cell.classList.add('today');
+        }
+
+        if (events[dateStr]) {
+          const eventDiv = document.createElement('div');
+          eventDiv.className = 'event';
+          eventDiv.textContent = events[dateStr];
+          cell.appendChild(eventDiv);
+        }
+
+        cell.addEventListener('click', () => openModal(dateStr));
+        calendarBody.appendChild(cell);
+      }
+    }
+
+    function openModal(dateStr) {
+      eventDateLabel.textContent = `Events for ${dateStr}`;
+      const events = JSON.parse(localStorage.getItem('calendarEvents') || '{}');
+      eventText.value = events[dateStr] || '';
+      eventModal.dataset.date = dateStr;
+      modalOverlay.style.display = 'block';
+      eventModal.style.display = 'block';
+      eventText.focus();
+    }
+
+    function closeModal() {
+      modalOverlay.style.display = 'none';
+      eventModal.style.display = 'none';
+    }
+
+    saveEventBtn.onclick = () => {
+      const dateStr = eventModal.dataset.date;
+      const text = eventText.value.trim();
+      const events = JSON.parse(localStorage.getItem('calendarEvents') || '{}');
+      if (text) {
+        events[dateStr] = text;
+      } else {
+        delete events[dateStr];
+      }
+      localStorage.setItem('calendarEvents', JSON.stringify(events));
+      closeModal();
+      showCalendar(currentYear, currentMonth);
+    };
+
+    cancelEventBtn.onclick = closeModal;
+    modalOverlay.onclick = closeModal;
+
+    prevMonthBtn.onclick = () => {
+      if (currentMonth === 0) {
+        currentMonth = 11;
+        currentYear--;
+      } else {
+        currentMonth--;
+      }
+      showCalendar(currentYear, currentMonth);
+    };
+
+    nextMonthBtn.onclick = () => {
+      if (currentMonth === 11) {
+        currentMonth = 0;
+        currentYear++;
+      } else {
+        currentMonth++;
+      }
+      showCalendar(currentYear, currentMonth);
+    };
+
+    // Initialize calendar and load todos on page load
+    window.onload = () => {
+      loadTodos();
+      const today = new Date();
+      showCalendar(today.getFullYear(), today.getMonth());
+    };
+  </script>
+</body>
+</html>
