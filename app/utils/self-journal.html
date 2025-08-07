@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Journal</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f4f4f4;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    form {
+      background-color: #fff;
+      border: 1px solid #ccc;
+      padding: 20px;
+      border-radius: 5px;
+      margin-bottom: 30px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+    input[type="submit"] {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    input[type="submit"]:hover {
+      background-color: #45a049;
+    }
+    .journal-entry {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .entry-title {
+      font-weight: bold;
+      font-size: 20px;
+      margin-bottom: 8px;
+      color: #444;
+    }
+    .entry-date {
+      font-size: 14px;
+      color: #999;
+      margin-bottom: 10px;
+    }
+    .entry-content {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Daily Journal</h1>
+
+  <form id="journalForm">
+    <label for="title">Title</label>
+    <input type="text" id="title" name="title" placeholder="Enter the Title" maxlength="50" required>
+
+    <label for="content">Content</label>
+    <textarea id="content" name="content" placeholder="Enter your journal entry..." maxlength="2000" rows="6" required></textarea>
+
+    <input type="submit" value="Submit">
+  </form>
+
+  <div id="entriesContainer"></div>
+
+  <script>
+    const form = document.getElementById('journalForm');
+    const entriesContainer = document.getElementById('entriesContainer');
+
+    // Load existing entries on page load
+    window.onload = function () {
+      const savedEntries = JSON.parse(localStorage.getItem('journalEntries')) || [];
+      savedEntries.forEach(entry => displayEntry(entry));
+    };
+
+    // Handle form submit
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const title = document.getElementById('title').value.trim();
+      const content = document.getElementById('content').value.trim();
+      const date = new Date().toLocaleString();
+
+      if (title === '' || content === '') {
+        alert('Please fill out both fields!');
+        return;
+      }
+
+      const entry = { title, content, date };
+      
+      // Save to localStorage
+      let entries = JSON.parse(localStorage.getItem('journalEntries')) || [];
+      entries.push(entry);
+      localStorage.setItem('journalEntries', JSON.stringify(entries));
+
+      displayEntry(entry);
+      form.reset();
+    });
+
+    // Display journal entry in the page
+    function displayEntry(entry) {
+      const entryDiv = document.createElement('div');
+      entryDiv.className = 'journal-entry';
+
+      entryDiv.innerHTML = `
+        <div class="entry-title">${entry.title}</div>
+        <div class="entry-date">${entry.date}</div>
+        <div class="entry-content">${entry.content}</div>
+      `;
+
+      // Add new entry at the top
+      entriesContainer.prepend(entryDiv);
+    }
+  </script>
+
+</body>
+</html>
