@@ -28,28 +28,16 @@ Created by Sawyer, this project is built entirely from scratch using HTML, CSS, 
 
 ---
 
-## 📁 Project Structure
-
-lifedash/
-├── index.html        # Main page
-├── style.css         # All app styling
-├── script.js         # App logic (tasks, journal, etc.)
-└── assets/
-    ├── logo.png      # Project logo
-    └── icons/        # UI icons
-🧑‍💻 How to Use
-Clone or download this repository:
-
-bash
-Copy code
+How to use:
+Copy code below
 git clone https://github.com/YOUR-USERNAME/lifedash.git
 Open index.html in your browser.
 
 Your data is saved automatically in your browser (via localStorage).
 
-No account, no tracking — just your dashboard, your way.
 
 🦊 License
+----------------------------------------------------------------------------
 LifeDash is licensed under the Mozilla Public License 2.0 (MPL-2.0).
 You're free to use, modify, and build upon this project, as long as any modified files remain open source.
 See the LICENSE file for full details.
@@ -67,15 +55,5 @@ Inspired by minimalist productivity tools and real-life student needs
 Suggestions, improvements, or ideas?
 Open an issue or fork the project and start building!
 
-yaml
-Copy code
+   <img width="504" height="504" alt="LifeDash_logo" src="https://github.com/user-attachments/assets/cb44a2d6-ce34-4037-bcaf-ae1a2cf51b68" />
 
----
-
-## 🔧 Next Steps for You
-
-1. Replace all `YOUR-USERNAME` with your actual GitHub username.
-2. Add your actual logo file path (maybe `assets/logo.png`)
-3. Once your project is live, you can also include a screenshot or demo video in the README using:
-   ```markdown
-   ![Screenshot of LifeDash](assets/screenshot.png)
