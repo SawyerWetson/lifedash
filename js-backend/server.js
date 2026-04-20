@@ -1,46 +1,53 @@
 const express = require("express");
-const cors = require("cors");
-
 const app = express();
-app.use(cors());
 app.use(express.json());
+app.use(express.static("public"));
 
-// RULE ENGINE (flags logic)
-function analyzeMessage(msg) {
-  msg = msg.toLowerCase();
+/* ---------------- AI PERSONALITY ---------------- */
+function generateResponse(msg) {
+  const m = msg.toLowerCase();
 
-  let score = 0;
+  if (m.includes("sad")) {
+    return "That sounds heavy. Do you want to talk about what’s behind it?";
+  }
 
-  const rules = [
-    { k: "hurt", w: 3 },
-    { k: "kill", w: 5 },
-    { k: "worthless", w: 2 },
-    { k: "hate myself", w: 4 },
-    { k: "stress", w: 1 },
-    { k: "panic", w: 2 }
-  ];
+  if (m.includes("angry")) {
+    return "That’s a strong feeling. What triggered it?";
+  }
 
-  rules.forEach(r => {
-    if (msg.includes(r.k)) score += r.w;
-  });
+  if (m.includes("stress")) {
+    return "Sounds like your mind is overloaded. Want to sort it out together?";
+  }
 
-  if (score >= 5) return "danger";
-  if (score >= 3) return "concern";
-  return "normal";
+  return "I’m listening — tell me more.";
 }
 
-// API: ShineBot analysis
-app.post("/analyze", (req, res) => {
-  const message = req.body.message || "";
-  const level = analyzeMessage(message);
+/* ---------------- SAFETY FLAGS ---------------- */
+function detectRisk(msg) {
+  const t = msg.toLowerCase();
+
+  const dangerPhrases = [
+    "kill myself",
+    "end my life",
+    "hurt myself"
+  ];
+
+  return dangerPhrases.some(p => t.includes(p));
+}
+
+/* ---------------- CHAT API ---------------- */
+app.post("/api/chat", (req, res) => {
+  const msg = req.body.message || "";
+
+  const flagged = detectRisk(msg);
+  const reply = generateResponse(msg);
 
   res.json({
-    level,
-    time: new Date().toISOString()
+    reply,
+    flagged
   });
 });
 
-// run server
 app.listen(3000, () => {
-  console.log("LifeDash backend running on http://localhost:3000");
+  console.log("LifeDash running on http://localhost:3000");
 });
