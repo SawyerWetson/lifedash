@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>LifeDash</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="tab active" id="home">
+  <div class="card">
+    <h1>LifeDash</h1>
+    <p>Your personal dashboard</p>
+  </div>
+
+  <div class="card">
+    <h3>How are you feeling?</h3>
+
+    <div class="mood">
+      <button onclick="mood('happy')">😁</button>
+      <button onclick="mood('meh')">🫤</button>
+      <button onclick="mood('sad')">😢</button>
+      <button onclick="mood('angry')">😡</button>
+    </div>
+
+    <p id="moodText"></p>
+  </div>
+</div>
+
+<div class="tab" id="shinebot">
+  <div class="card">
+    <h2>ShineBot 🤖</h2>
+
+    <div id="chat"></div>
+
+    <div class="inputRow">
+      <input id="msg" placeholder="Talk to ShineBot...">
+      <button onclick="send()">Send</button>
+    </div>
+  </div>
+</div>
+
+<div class="tabbar">
+  <button onclick="tab('home')">🏠</button>
+  <button onclick="tab('shinebot')">🤖</button>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
